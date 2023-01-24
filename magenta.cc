@@ -2,6 +2,35 @@
 
 std::array<uint8_t, 256> f {};
 
+// === helper functions =============================================
+
+state_t concat(half_state_t const& a, half_state_t const& b) {
+	return {
+		a[0], a[1], a[2], a[3],
+		a[4], a[5], a[6], a[7],
+		b[0], b[1], b[2], b[3],
+		b[4], b[5], b[6], b[7],
+	};
+}
+
+state_t swap_halves(state_t const& x) {
+	return {
+		x[ 8], x[ 9], x[10], x[11],
+		x[12], x[13], x[14], x[15],
+		x[ 0], x[ 1], x[ 2], x[ 3],
+		x[ 4], x[ 5], x[ 6], x[ 7],
+	};
+}
+
+void check_init(void) {
+	if(f[0] == 0) {
+		fprintf(stderr, "ERROR: Run MAGENTA_init first.\n");
+		exit(-1);
+	}
+}
+
+// === CIPHER CIPHER ======== CYBER CYBER ========= CYPHER CYPHER ===
+
 void MAGENTA_init(void) {
 	f[0] = 1;
 	uint16_t current = f[0];
@@ -70,12 +99,7 @@ half_state_t SK(mkey_t const& key, size_t n) {
 }
 
 half_state_t F(half_state_t const& X2, half_state_t const& SKn) {
-	state_t in {
-		X2[0], X2[1], X2[2], X2[3],
-		X2[4], X2[5], X2[6], X2[7],
-		SKn[0], SKn[1], SKn[2], SKn[3],
-		SKn[4], SKn[5], SKn[6], SKn[7],
-	};
+	state_t in = concat(X2, SKn);
 	state_t out = S(C(3, in));
 	return {
 		out[0], out[1], out[2], out[3],
@@ -83,7 +107,7 @@ half_state_t F(half_state_t const& X2, half_state_t const& SKn) {
 	};
 }
 
-state_t mround(size_t n, state_t const& X, half_state_t const& SKn) {
+state_t rnd(size_t n, state_t const& X, half_state_t const& SKn) {
 	half_state_t X1 {
 		X[0], X[1], X[2], X[3],
 		X[4], X[5], X[6], X[7],
@@ -95,35 +119,14 @@ state_t mround(size_t n, state_t const& X, half_state_t const& SKn) {
 
 	half_state_t tmp = sxor(X1, F(X2, SKn));
 	
-	return {
-		X2[0], X2[1], X2[2], X2[3],
-		X2[4], X2[5], X2[6], X2[7],
-		tmp[0], tmp[1], tmp[2], tmp[3],
-		tmp[4], tmp[5], tmp[6], tmp[7],
-	};
-}
-
-state_t swap_halves(state_t const& x) {
-	return {
-		x[ 8], x[ 9], x[10], x[11],
-		x[12], x[13], x[14], x[15],
-		x[ 0], x[ 1], x[ 2], x[ 3],
-		x[ 4], x[ 5], x[ 6], x[ 7],
-	};
-}
-
-void check_init(void) {
-	if(f[0] == 0) {
-		printf("ERROR: Run MAGENTA_init first.\n");
-		exit(-1);
-	}
+	return concat(X2, tmp);
 }
 
 state_t MAGENTA_encrypt(state_t const& x, mkey_t const& key) {
 	check_init();
 	state_t state = x;
 	for (size_t i = 1; i <= 6; i++) {
-		state = mround(i, state, SK(key, i));
+		state = rnd(i, state, SK(key, i));
 	}
 	return state;
 }
@@ -132,7 +135,7 @@ state_t MAGENTA_decrypt(state_t const& x, mkey_t const& key) {
 	check_init();
 	state_t state = swap_halves(x);
 	for (size_t i = 1; i <= 6; i++) {
-		state = mround(i, state, SK(key, i));
+		state = rnd(i, state, SK(key, i));
 	}
 	return swap_halves(state);
 }
