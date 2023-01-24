@@ -9,7 +9,6 @@ void MAGENTA_init(void) {
 		current <<= 1;
 		if (current & 0x100) {
 			current ^= 101;
-			current &= 0xff;
 		}
 		f[i] = current;
 	}
