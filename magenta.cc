@@ -70,9 +70,12 @@ half_state_t SK(mkey_t const& key, size_t n) {
 }
 
 half_state_t F(half_state_t const& X2, half_state_t const& SKn) {
-	state_t in;
-	std::copy(X2.begin(), X2.end(), in.begin());
-	std::copy(SKn.begin(), SKn.end(), in.begin() + 8);
+	state_t in {
+		X2[0], X2[1], X2[2], X2[3],
+		X2[4], X2[5], X2[6], X2[7],
+		SKn[0], SKn[1], SKn[2], SKn[3],
+		SKn[4], SKn[5], SKn[6], SKn[7],
+	};
 	state_t out = S(C(3, in));
 	return {
 		out[0], out[1], out[2], out[3],
@@ -81,16 +84,23 @@ half_state_t F(half_state_t const& X2, half_state_t const& SKn) {
 }
 
 state_t mround(size_t n, state_t const& X, half_state_t const& SKn) {
-	half_state_t X1, X2;
-	std::copy(X.begin(), X.begin() + 8, X1.begin());
-	std::copy(X.begin() + 8, X.end(), X2.begin());
+	half_state_t X1 {
+		X[0], X[1], X[2], X[3],
+		X[4], X[5], X[6], X[7],
+	};
+	half_state_t X2 {
+		X[ 8], X[ 9], X[10], X[11],
+		X[12], X[13], X[14], X[15],
+	};
 
 	half_state_t tmp = sxor(X1, F(X2, SKn));
 	
-	state_t out;
-	std::copy(X2.begin(), X2.end(), out.begin());
-	std::copy(tmp.begin(), tmp.end(), out.begin() + 8);
-	return out;
+	return {
+		X2[0], X2[1], X2[2], X2[3],
+		X2[4], X2[5], X2[6], X2[7],
+		tmp[0], tmp[1], tmp[2], tmp[3],
+		tmp[4], tmp[5], tmp[6], tmp[7],
+	};
 }
 
 state_t swap_halves(state_t const& x) {

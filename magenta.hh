@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cstdio>
+#include <cstdlib>
 #include <cinttypes>
 
 #include <array>
-#include <algorithm>
 
 using state_t = std::array<uint8_t, 16>;
 using half_state_t = std::array<uint8_t, 8>;
