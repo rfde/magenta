@@ -1,6 +1,6 @@
 #include "magenta.hh"
 
-std::array<uint8_t, 256> f;
+std::array<uint8_t, 256> f {};
 
 void MAGENTA_init(void) {
 	f[0] = 1;
@@ -57,7 +57,6 @@ state_t C(size_t n, state_t const& w) {
 }
 
 half_state_t SK(mkey_t const& key, size_t n) {
-	assert(n >= 1 && n <= 6);
 	half_state_t out;
 	if (n == 1 || n == 2 || n == 5 || n == 6) {
 		std::copy(key.begin(), key.begin() + 8, out.begin());
@@ -100,7 +99,15 @@ state_t swap_halves(state_t const& x) {
 	};
 }
 
+void check_init(void) {
+	if(f[0] == 0) {
+		printf("ERROR: Run MAGENTA_init first.\n");
+		exit(-1);
+	}
+}
+
 state_t MAGENTA_encrypt(state_t const& x, mkey_t const& key) {
+	check_init();
 	state_t state = x;
 	for (size_t i = 1; i <= 6; i++) {
 		state = mround(i, state, SK(key, i));
@@ -109,6 +116,7 @@ state_t MAGENTA_encrypt(state_t const& x, mkey_t const& key) {
 }
 
 state_t MAGENTA_decrypt(state_t const& x, mkey_t const& key) {
+	check_init();
 	state_t state = swap_halves(x);
 	for (size_t i = 1; i <= 6; i++) {
 		state = mround(i, state, SK(key, i));

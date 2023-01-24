@@ -2,7 +2,6 @@
 
 #include <cstdio>
 #include <cinttypes>
-#include <cassert>
 
 #include <array>
 #include <algorithm>
