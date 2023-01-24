@@ -92,10 +92,12 @@ state_t mround(size_t n, state_t const& X, half_state_t const& SKn) {
 }
 
 state_t swap_halves(state_t const& x) {
-	state_t swapped;
-	std::copy(x.begin() + 8, x.end(), swapped.begin());
-	std::copy(x.begin(), x.begin() + 8, swapped.begin() + 8);
-	return swapped;
+	return {
+		x[ 8], x[ 9], x[10], x[11],
+		x[12], x[13], x[14], x[15],
+		x[ 0], x[ 1], x[ 2], x[ 3],
+		x[ 4], x[ 5], x[ 6], x[ 7],
+	};
 }
 
 state_t MAGENTA_encrypt(state_t const& x, mkey_t const& key) {
