@@ -30,8 +30,8 @@ state_t pi(state_t const& x) {
 	}
 	state_t out;
 	for (size_t i = 0; i < 8; i += 1) {
-		out[2*i] = tmp[i] >> 8;
-		out[2*i+1] = tmp[i] & 0xff;
+		out[2 * i] = tmp[i] >> 8;
+		out[2 * i + 1] = tmp[i] & 0xff;
 	}
 	return out;
 }
@@ -57,13 +57,16 @@ state_t C(size_t n, state_t const& w) {
 }
 
 half_state_t SK(mkey_t const& key, size_t n) {
-	half_state_t out;
-	if (n == 1 || n == 2 || n == 5 || n == 6) {
-		std::copy(key.begin(), key.begin() + 8, out.begin());
-	} else {
-		std::copy(key.begin() + 8, key.end(), out.begin());
+	if (n == 3 || n == 4) {
+		return {
+			key[ 8], key[ 9], key[10], key[11],
+			key[12], key[13], key[14], key[15],
+		};
 	}
-	return out;
+	return {
+		key[0], key[1], key[2], key[3],
+		key[4], key[5], key[6], key[7],
+	};
 }
 
 half_state_t F(half_state_t const& X2, half_state_t const& SKn) {
