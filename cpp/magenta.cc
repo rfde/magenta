@@ -1,10 +1,17 @@
 #include "magenta.hh"
 
-std::array<uint8_t, 256> f {};
-
 // === helper functions =============================================
 
-state_t concat(half_state_t const& a, half_state_t const& b) {
+template <typename arr_t>
+arr_t MAGENTA128::sxor(arr_t const& a, arr_t const& b) {
+	arr_t out;
+	for (size_t i = 0; i < a.size(); i++) {
+		out[i] = a[i] ^ b[i];
+	}
+	return out;
+}
+
+state_t MAGENTA128::concat(half_state_t const& a, half_state_t const& b) {
 	return {
 		a[0], a[1], a[2], a[3],
 		a[4], a[5], a[6], a[7],
@@ -13,7 +20,7 @@ state_t concat(half_state_t const& a, half_state_t const& b) {
 	};
 }
 
-state_t swap_halves(state_t const& x) {
+state_t MAGENTA128::swap_halves(state_t const& x) {
 	return {
 		x[ 8], x[ 9], x[10], x[11],
 		x[12], x[13], x[14], x[15],
@@ -22,16 +29,9 @@ state_t swap_halves(state_t const& x) {
 	};
 }
 
-void check_init(void) {
-	if(f[0] == 0) {
-		fprintf(stderr, "ERROR: Run MAGENTA_init first.\n");
-		exit(-1);
-	}
-}
-
 // === CIPHER CIPHER ======== CYBER CYBER ========= CYPHER CYPHER ===
 
-void MAGENTA_init(void) {
+MAGENTA128::MAGENTA128(void) {
 	f[0] = 1;
 	uint16_t current = f[0];
 	for (size_t i = 1; i < 255; i++) {
@@ -44,15 +44,15 @@ void MAGENTA_init(void) {
 	f[255] = 0;
 }
 
-uint8_t A(uint8_t x, uint8_t y) {
+uint8_t MAGENTA128::A(uint8_t x, uint8_t y) {
 	return f[x ^ f[y]];
 }
 
-uint16_t PE(uint8_t x, uint8_t y) {
+uint16_t MAGENTA128::PE(uint8_t x, uint8_t y) {
 	return (A(x, y) << 8) | A(y, x);
 }
 
-state_t pi(state_t const& x) {
+state_t MAGENTA128::pi(state_t const& x) {
 	std::array<uint16_t, 8> tmp;
 	for (size_t i = 0; i < 8; i++) {
 		tmp[i] = PE(x[i], x[8+i]);
@@ -65,11 +65,11 @@ state_t pi(state_t const& x) {
 	return out;
 }
 
-state_t T(state_t const& w) {
+state_t MAGENTA128::T(state_t const& w) {
 	return pi(pi(pi(pi(w))));
 }
 
-state_t S(state_t const& x) {
+state_t MAGENTA128::S(state_t const& x) {
 	return {
 		x[ 0], x[ 2], x[ 4], x[ 6],
 		x[ 8], x[10], x[12], x[14],
@@ -78,14 +78,14 @@ state_t S(state_t const& x) {
 	};
 }
 
-state_t C(size_t n, state_t const& w) {
+state_t MAGENTA128::C(size_t n, state_t const& w) {
 	if (n == 1) {
 		return T(w);
 	}
 	return T(sxor(w, S(C(n-1, w))));
 }
 
-half_state_t SK(mkey_t const& key, size_t n) {
+half_state_t MAGENTA128::SK(mkey_t const& key, size_t n) {
 	if (n == 3 || n == 4) {
 		return {
 			key[ 8], key[ 9], key[10], key[11],
@@ -98,7 +98,7 @@ half_state_t SK(mkey_t const& key, size_t n) {
 	};
 }
 
-half_state_t F(half_state_t const& X2, half_state_t const& SKn) {
+half_state_t MAGENTA128::F(half_state_t const& X2, half_state_t const& SKn) {
 	state_t in = concat(X2, SKn);
 	state_t out = S(C(3, in));
 	return {
@@ -107,7 +107,7 @@ half_state_t F(half_state_t const& X2, half_state_t const& SKn) {
 	};
 }
 
-state_t rnd(size_t n, state_t const& X, half_state_t const& SKn) {
+state_t MAGENTA128::rnd(size_t n, state_t const& X, half_state_t const& SKn) {
 	half_state_t X1 {
 		X[0], X[1], X[2], X[3],
 		X[4], X[5], X[6], X[7],
@@ -122,8 +122,7 @@ state_t rnd(size_t n, state_t const& X, half_state_t const& SKn) {
 	return concat(X2, tmp);
 }
 
-state_t MAGENTA_encrypt(state_t const& x, mkey_t const& key) {
-	check_init();
+state_t MAGENTA128::encrypt(state_t const& x, mkey_t const& key) {
 	state_t state = x;
 	for (size_t i = 1; i <= 6; i++) {
 		state = rnd(i, state, SK(key, i));
@@ -131,8 +130,7 @@ state_t MAGENTA_encrypt(state_t const& x, mkey_t const& key) {
 	return state;
 }
 
-state_t MAGENTA_decrypt(state_t const& x, mkey_t const& key) {
-	check_init();
+state_t MAGENTA128::decrypt(state_t const& x, mkey_t const& key) {
 	state_t state = swap_halves(x);
 	for (size_t i = 1; i <= 6; i++) {
 		state = rnd(i, state, SK(key, i));

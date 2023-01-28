@@ -1,7 +1,15 @@
 #include "magenta.hh"
 
+template <typename arr_t>
+void print_state(arr_t const& s) {
+	for (size_t i = 0; i < s.size(); i++) {
+		printf("%.2x ", s[i]);
+	}
+	puts("");
+}
+
 int main() {
-	MAGENTA_init();
+	MAGENTA128 magenta;
 
 	mkey_t key = {
 		0x1f, 0x17, 0xf7, 0xe2,
@@ -22,11 +30,11 @@ int main() {
 	printf("KEY: ");
 	print_state(key);
 
-	state_t ciphertext = MAGENTA_encrypt(plaintext, key);
+	state_t ciphertext = magenta.encrypt(plaintext, key);
 	printf("CT:  ");
 	print_state(ciphertext);
 
-	state_t pt2 = MAGENTA_decrypt(ciphertext, key);
+	state_t pt2 = magenta.decrypt(ciphertext, key);
 	printf("PT2: ");
 	print_state(pt2);
 }

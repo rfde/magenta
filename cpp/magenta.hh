@@ -11,23 +11,28 @@ using half_state_t = std::array<uint8_t, 8>;
 
 using mkey_t = std::array<uint8_t, 16>;
 
-template <typename arr_t>
-void print_state(arr_t const& s) {
-	for (size_t i = 0; i < s.size(); i++) {
-		printf("%.2x ", s[i]);
-	}
-	puts("");
-}
+class MAGENTA128 {
+private:
+	std::array<uint8_t, 256> f {};
 
-template <typename arr_t>
-arr_t sxor(arr_t const& a, arr_t const& b) {
-	arr_t out;
-	for (size_t i = 0; i < a.size(); i++) {
-		out[i] = a[i] ^ b[i];
-	}
-	return out;
-}
+	// === helper functions =============================================
+	template <typename arr_t> arr_t sxor(arr_t const& a, arr_t const& b);
+	state_t concat(half_state_t const& a, half_state_t const& b);
+	state_t swap_halves(state_t const& x);
 
-void MAGENTA_init(void);
-state_t MAGENTA_encrypt(state_t const& x, mkey_t const& key);
-state_t MAGENTA_decrypt(state_t const& x, mkey_t const& key);
+	// === CIPHER CIPHER ======== CYBER CYBER ========= CYPHER CYPHER ===
+	uint8_t A(uint8_t x, uint8_t y);
+	uint16_t PE(uint8_t x, uint8_t y);
+	state_t pi(state_t const& x);
+	state_t T(state_t const& w);
+	state_t S(state_t const& x);
+	state_t C(size_t n, state_t const& w);
+	half_state_t SK(mkey_t const& key, size_t n);
+	half_state_t F(half_state_t const& X2, half_state_t const& SKn);
+	state_t rnd(size_t n, state_t const& X, half_state_t const& SKn);
+
+public:
+	MAGENTA128(void);
+	state_t encrypt(state_t const& x, mkey_t const& key);
+	state_t decrypt(state_t const& x, mkey_t const& key);
+};
