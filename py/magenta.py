@@ -1,4 +1,4 @@
-class MAGENTA:
+class MAGENTA128:
 	def __init__(self):
 		self.__f = [0 for i in range(256)]
 		self.__f[0] = 1
@@ -10,13 +10,6 @@ class MAGENTA:
 			self.__f[i] = current & 0xff
 
 	# === helper functions =============================================
-
-	@staticmethod
-	def state_to_str(x):
-		out = ""
-		for e in x:
-			out += f"{e:02x} "
-		return out
 
 	def __swap_halves(self, x):
 		return x[8:16] + x[0:8]
