@@ -58,10 +58,7 @@ class MAGENTA:
 		return self.__T(self.__sxor(w, self.__S(self.__C(n - 1, w))))
 
 	def __SK(self, key, n):
-		if n == 3 or n == 4:
-			return key[8:16]
-		else:
-			return key[0:8]
+		return key[8:16] if (n == 3 or n == 4) else key[0:8]
 
 	def __F(self, X2, SKn):
 		inp = X2 + SKn
