@@ -2,7 +2,7 @@
 
 int main() {
 	MAGENTA_init();
-	
+
 	mkey_t key = {
 		0x1f, 0x17, 0xf7, 0xe2,
 		0x6b, 0x78, 0xd7, 0x85,
@@ -17,9 +17,16 @@ int main() {
 		0xc3, 0xd3, 0xe3, 0xf3,
 	};
 
+	printf("PT:  ");
+	print_state(plaintext);
+	printf("KEY: ");
+	print_state(key);
+
 	state_t ciphertext = MAGENTA_encrypt(plaintext, key);
+	printf("CT:  ");
 	print_state(ciphertext);
 
-	state_t dec = MAGENTA_decrypt(ciphertext, key);
-	print_state(dec);
+	state_t pt2 = MAGENTA_decrypt(ciphertext, key);
+	printf("PT2: ");
+	print_state(pt2);
 }
