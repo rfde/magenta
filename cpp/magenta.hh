@@ -11,7 +11,7 @@ using half_state_t = std::array<uint8_t, 8>;
 
 using mkey_t = std::array<uint8_t, 16>;
 
-class MAGENTA128 {
+class MAGENTA {
 private:
 	std::array<uint8_t, 256> f {};
 
@@ -32,7 +32,7 @@ private:
 	state_t rnd(size_t n, state_t const& X, half_state_t const& SKn);
 
 public:
-	MAGENTA128(void);
+	MAGENTA(void);
 	state_t encrypt(state_t const& x, mkey_t const& key);
 	state_t decrypt(state_t const& x, mkey_t const& key);
 };

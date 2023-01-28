@@ -1,4 +1,4 @@
-class MAGENTA128:
+class MAGENTA:
 	def __init__(self):
 		self.__f = [0 for i in range(256)]
 		self.__f[0] = 1

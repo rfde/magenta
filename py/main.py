@@ -1,4 +1,4 @@
-from magenta import MAGENTA128
+from magenta import MAGENTA
 
 def state_to_str(x):
 	out = ""
@@ -8,7 +8,7 @@ def state_to_str(x):
 
 
 if __name__ == '__main__':
-	magenta = MAGENTA128()
+	magenta = MAGENTA()
 	key = [
 		0x1f, 0x17, 0xf7, 0xe2,
 		0x6b, 0x78, 0xd7, 0x85,

@@ -1,4 +1,4 @@
-# MAGENTA128
+# MAGENTA
 
 See also:
 - http://www.quadibloc.com/crypto/co040411.htm

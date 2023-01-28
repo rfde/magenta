@@ -9,7 +9,7 @@ void print_state(arr_t const& s) {
 }
 
 int main() {
-	MAGENTA128 magenta;
+	MAGENTA magenta;
 
 	mkey_t key = {
 		0x1f, 0x17, 0xf7, 0xe2,
