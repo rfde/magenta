@@ -21,9 +21,9 @@ class MAGENTA:
 	def __swap_halves(self, x):
 		return x[8:16] + x[0:8]
 
-	def __sxor(self, a, b):
-		assert (len(a) == len(b))
-		return [a[i] ^ b[i] for i in range(len(a))]
+	def __sxor(self, x, y):
+		assert (len(x) == len(y))
+		return [x[i] ^ y[i] for i in range(len(x))]
 
 	# === CIPHER CIPHER ======== CYBER CYBER ========= CYPHER CYPHER ===
 
