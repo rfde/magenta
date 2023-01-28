@@ -99,9 +99,7 @@ class MAGENTA:
 			X[ 8], X[ 9], X[10], X[11],
 			X[12], X[13], X[14], X[15],
 		]
-
 		tmp = self.__sxor(X1, self.__F(X2, SKn))
-
 		return self.__concat(X2, tmp)
 
 	def encrypt(self, x, key):
