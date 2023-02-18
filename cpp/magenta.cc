@@ -132,8 +132,38 @@ state_t MAGENTA::encrypt(state_t const& x, mkey_t const& key) {
 
 state_t MAGENTA::decrypt(state_t const& x, mkey_t const& key) {
 	state_t state = swap_halves(x);
-	for (size_t i = 1; i <= 6; i++) {
-		state = rnd(i, state, SK(key, i));
-	}
+	state = encrypt(state, key);
 	return swap_halves(state);
+}
+
+extern "C" {
+	void MAGENTA_enc(uint8_t* in, uint8_t* key, uint8_t* out) {
+		MAGENTA m;
+		state_t state_in, state_key;
+		for (size_t i = 0; i < 16; i++) {
+			state_in[i] = in[i];
+		}
+		for (size_t i = 0; i < 16; i++) {
+			state_key[i] = key[i];
+		}
+		state_t ct = m.encrypt(state_in, state_key);
+		for (size_t i = 0; i < 16; i++) {
+			out[i] = ct[i];
+		}
+	}
+
+	void MAGENTA_dec(uint8_t* in, uint8_t* key, uint8_t* out) {
+		MAGENTA m;
+		state_t state_in, state_key;
+		for (size_t i = 0; i < 16; i++) {
+			state_in[i] = in[i];
+		}
+		for (size_t i = 0; i < 16; i++) {
+			state_key[i] = key[i];
+		}
+		state_t ct = m.decrypt(state_in, state_key);
+		for (size_t i = 0; i < 16; i++) {
+			out[i] = ct[i];
+		}
+	}
 }

@@ -1,2 +1,5 @@
 magenta
+magenta_shared
+libmagenta.so
+*.o
 __pycache__/
