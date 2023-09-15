@@ -1,14 +1,17 @@
+CXXFLAGS=-O3
+CFLAGS=-O3
+
 all: magenta libmagenta.so magenta_shared
 
 magenta: magenta.cc magenta.hh main.cc
-	$(CXX) -o magenta -Wall magenta.cc main.cc
+	$(CXX) $(CXXFLAGS) -o magenta -Wall magenta.cc main.cc
 
 libmagenta.so: magenta.cc magenta.hh
-	$(CXX) -c magenta.cc
-	$(CC) -shared -o libmagenta.so magenta.o
+	$(CXX) $(CXXFLAGS) -c magenta.cc
+	$(CC) $(CFLAGS) -shared -o libmagenta.so magenta.o
 
 magenta_shared: magenta_shared.c
-	$(CC) -o magenta_shared -L. -lmagenta magenta_shared.c
+	$(CC) $(CFLAGS) -o magenta_shared -L. -lmagenta magenta_shared.c
 
 clean:
 	rm -f magenta
